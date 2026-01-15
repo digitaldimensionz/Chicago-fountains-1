@@ -1,0 +1,293 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chicago Public Water Fountains</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #222;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background: #121212;
+      color: #e0e0e0;
+    }
+
+    header {
+      background: #1a73e8;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    nav {
+      background: #fff;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #1a73e8;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    #search {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .fountain-list {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    body.dark .fountain-list {
+      background: #1e1e1e;
+    }
+
+    #map {
+      width: 100%;
+      height: 450px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .gallery img {
+      width: 100%;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .toggle-btn {
+      background: #1a73e8;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>Chicago Public Water Fountains</header>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="about.html">About</a>
+</nav>
+
+<div class="container">
+
+  <button class="toggle-btn" onclick="toggleMode()">Toggle Dark/Light Mode</button>
+
+  <input type="text" id="search" placeholder="Search fountains...">
+
+  <div class="fountain-list">
+    <h2>Fountain Locations</h2>
+    <ul id="fountainList">
+      <li data-name="Grant Park – South Fountain">Grant Park – South Fountain</li>
+      <li data-name="Lakefront Trail – Oak Street Beach Fountain">Lakefront Trail – Oak Street Beach Fountain</li>
+      <li data-name="Humboldt Park – Boathouse Fountain">Humboldt Park – Boathouse Fountain</li>
+      <li data-name="Lincoln Park – North Pond Fountain">Lincoln Park – North Pond Fountain</li>
+    </ul>
+  </div>
+
+  <h2>Interactive Map</h2>
+  <div id="map"></div>
+
+  <h2>Photo Gallery</h2>
+  <div class="gallery">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/02/Grant_Park_Chicago.jpg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Oak_Street_Beach_Chicago.jpg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Humboldt_Park_Boathouse_Chicago.jpg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Lincoln_Park_Chicago.jpg">
+  </div>
+
+</div>
+
+<script>
+  // Dark mode toggle
+  function toggleMode() {
+    document.body.classList.toggle("dark");
+  }
+
+  // Fountain data
+  const fountains = [
+    {
+      name: "Grant Park – South Fountain",
+      position: { lat: 41.8721, lng: -87.6216 },
+      description: "Located in Grant Park near the southern gardens."
+    },
+    {
+      name: "Lakefront Trail – Oak Street Beach Fountain",
+      position: { lat: 41.9010, lng: -87.6237 },
+      description: "Popular stop for runners and cyclists along the lakefront."
+    },
+    {
+      name: "Humboldt Park – Boathouse Fountain",
+      position: { lat: 41.9023, lng: -87.7010 },
+      description: "Historic fountain near the iconic boathouse."
+    },
+    {
+      name: "Lincoln Park – North Pond Fountain",
+      position: { lat: 41.9265, lng: -87.6368 },
+      description: "Quiet fountain near the nature sanctuary."
+    }
+  ];
+
+  // Search filter
+  document.getElementById("search").addEventListener("input", function() {
+    const term = this.value.toLowerCase();
+    document.querySelectorAll("#fountainList li").forEach(li => {
+      li.style.display = li.dataset.name.toLowerCase().includes(term) ? "" : "none";
+    });
+  });
+
+  // Google Map
+  function initMap() {
+    const chicagoCenter = { lat: 41.8781, lng: -87.6298 };
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 11,
+      center: chicagoCenter,
+    });
+
+    fountains.forEach(fountain => {
+      const marker = new google.maps.Marker({
+        position: fountain.position,
+        map: map,
+        title: fountain.name
+      });
+
+      const info = new google.maps.InfoWindow({
+        content: `<strong>${fountain.name}</strong><br>${fountain.description}`
+      });
+
+      marker.addListener("click", () => info.open(map, marker));
+    });
+  }
+</script>
+
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap">
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About This Project</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #1a73e8;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    nav {
+      background: #fff;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #1a73e8;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>About This Project</header>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="about.html">About</a>
+</nav>
+
+<div class="container">
+  <h2>Why This Site Exists</h2>
+  <p>
+    This project maps public drinking water fountains around the Chicago area.
+    It helps runners, cyclists, tourists, and everyday residents find clean water
+    while exploring the city.
+  </p>
+
+  <h2>Features</h2>
+  <ul>
+    <li>Interactive Google Map with clickable fountain markers</li>
+    <li>Searchable fountain list</li>
+    <li>Dark/Light mode toggle</li>
+    <li>Photo gallery</li>
+    <li>Mobile-friendly layout</li>
+  </ul>
+
+  <h2>Future Plans</h2>
+  <p>
+    More fountains will be added, along with user-submitted locations,
+    accessibility info, and seasonal availability.
+  </p>
+</div>
+
+</body>
+</html>
